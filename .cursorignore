@@ -1,0 +1,71 @@
+# Unity Generated
+Library/
+Temp/
+Obj/
+Build/
+Builds/
+Logs/
+MemoryCaptures/
+UserSettings/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+
+# Unity Cache
+[Bb]in/
+[Tt]emp/
+obj/
+
+# Addressables
+ServerData/
+
+# Asset Import Pipeline
+Assets/AssetStoreTools*
+
+# Package Cache
+Packages/packages-lock.json
+
+# Crash Reports
+sysinfo.txt
+
+# Mac
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Git
+.git/
+
+# Cursor
+.cursor/cache/
+.cursor/index/
+
+# Node
+node_modules/
+
+# Generated Files
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# APK / AAB / iOS Builds
+*.apk
+*.aab
+*.ipa
+
+# Large Binary Files
+*.mp4
+*.mov
+*.psd
+*.blend
