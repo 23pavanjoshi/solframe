@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 public class CarController : MonoBehaviour
 {
     public event Action<int> OnLaneChanged;
-    public event Action<float> OnSpeedChanged;
+    public static event Action<float> OnSpeedChanged;
 
     [Header("Speed")]
     [SerializeField] private float startSpeed = 10f;
@@ -44,6 +44,7 @@ public class CarController : MonoBehaviour
 
     private void OnEnable()
     {
+        GameManager.OnGameStart += HandleGameStart;
         _currentSpeed = Mathf.Clamp(startSpeed, 0f, maxSpeed);
         _speedTimer = 0f;
 
@@ -54,14 +55,23 @@ public class CarController : MonoBehaviour
 
     private void OnDisable()
     {
+        GameManager.OnGameStart -= HandleGameStart;
         _laneTween?.Kill();
         _laneTween = null;
         _isChangingLane = false;
         _touchTracking = false;
     }
+    
+    private void HandleGameStart()
+    {
+        OnSpeedChanged?.Invoke(_currentSpeed);
+    }
 
     private void Update()
     {
+        if (GameManager.Instance.State != GameManager.GameState.Playing)
+            return;
+        
         MoveForward();
         TickSpeedRamp();
         HandleKeyboardInput();

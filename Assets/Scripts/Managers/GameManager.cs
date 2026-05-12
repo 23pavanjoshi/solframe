@@ -50,7 +50,6 @@ public class GameManager : MonoBehaviour
     private void OnEnable()
     {
         TryHookTrafficSpawner();
-        StartGame();
     }
 
     private void OnDisable()
@@ -66,6 +65,8 @@ public class GameManager : MonoBehaviour
 
         Score = Mathf.Max(0f, player.position.z - _scoreStartPlayerZ);
 
+        UIManager.Instance.UpdateScore(Score);
+        // UIManager.Instance.UpdateSpeed(speed);
         if (Score > BestScore)
         {
             Debug.Log("Score : " + Score);
@@ -96,6 +97,11 @@ public class GameManager : MonoBehaviour
         OnGameRestart?.Invoke();
     }
 
+    public void PauseGame()
+    {
+        // Time.timeScale = 0f;
+    }
+
     public void QuitGame()
     {
         SaveBestScoreIfNeeded();
@@ -110,6 +116,7 @@ public class GameManager : MonoBehaviour
         SetState(GameState.GameOver);
         SaveBestScoreIfNeeded();
         OnGameOver?.Invoke();
+        UIManager.Instance.UpdateBestScore(BestScore);
     }
 
     private void TryHookTrafficSpawner()
