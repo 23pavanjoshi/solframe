@@ -2,6 +2,7 @@ using System;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.Cinemachine;
 
 public class CarController : MonoBehaviour
 {
@@ -23,6 +24,11 @@ public class CarController : MonoBehaviour
     [Header("Input")]
     [SerializeField] private float swipeDeltaThresholdPixels = 50f;
 
+    private static CinemachineImpulseSource _impulseSource;
+    
+    [SerializeField] private GameObject collisionFXPrefab;
+    [SerializeField] private ParticleSystem speedLinesFX;
+    
     private readonly float[] _laneXs = new float[3];
     private int _currentLaneIndex = 1; // 0=left, 1=center, 2=right
 
@@ -40,11 +46,13 @@ public class CarController : MonoBehaviour
         _laneXs[0] = leftLaneX;
         _laneXs[1] = centerLaneX;
         _laneXs[2] = rightLaneX;
+        _impulseSource = GetComponent<CinemachineImpulseSource>();
     }
 
     private void OnEnable()
     {
         GameManager.OnGameStart += HandleGameStart;
+        GameManager.OnGameOver += HandleGameOver;
         _currentSpeed = Mathf.Clamp(startSpeed, 0f, maxSpeed);
         _speedTimer = 0f;
 
@@ -56,6 +64,7 @@ public class CarController : MonoBehaviour
     private void OnDisable()
     {
         GameManager.OnGameStart -= HandleGameStart;
+        GameManager.OnGameOver -= HandleGameOver;
         _laneTween?.Kill();
         _laneTween = null;
         _isChangingLane = false;
@@ -76,6 +85,18 @@ public class CarController : MonoBehaviour
         TickSpeedRamp();
         HandleKeyboardInput();
         HandleTouchSwipeInput();
+        UpdateSpeedLines();
+    }
+    
+    private void UpdateSpeedLines()
+    {
+        if (speedLinesFX == null) return;
+    
+        var emission = speedLinesFX.emission;
+    
+        // Map speed 10→30 to emission 0→80
+        float t = Mathf.InverseLerp(10f, 30f, _currentSpeed);
+        emission.rateOverTime = Mathf.Lerp(0f, 80f, t);
     }
 
     private void MoveForward()
@@ -178,5 +199,36 @@ public class CarController : MonoBehaviour
         var p = transform.position;
         p.x = _laneXs[_currentLaneIndex];
         transform.position = p;
+    }
+    
+    private void OnTriggerEnter(Collider other)
+    {
+        if (GameManager.Instance.State != GameManager.GameState.Playing)
+            return;
+            
+        if (other == null)
+            return;
+            
+        if (other.CompareTag("Traffic"))
+        {
+            if (collisionFXPrefab != null)
+            {
+                Instantiate(collisionFXPrefab, transform.position, Quaternion.identity);
+            }
+            
+            // Fire screen shake
+            _impulseSource.GenerateImpulse();
+        
+            // Fire game over
+            GameManager.Instance.GameOver();
+        }
+    }
+    
+    private void HandleGameOver()
+    {
+        if (speedLinesFX == null) return;
+    
+        var emission = speedLinesFX.emission;
+        emission.rateOverTime = 0;
     }
 }

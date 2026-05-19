@@ -104,6 +104,8 @@ public class UIManager : MonoBehaviour
     {
         if (scoreText != null)
             scoreText.text = Mathf.FloorToInt(distance).ToString("D3") + "m";
+        
+        finalScoreText.text = Mathf.FloorToInt(distance).ToString("D3") + "m";
     }
 
     public void UpdateSpeed(float speed)
@@ -114,7 +116,8 @@ public class UIManager : MonoBehaviour
 
     public void UpdateBestScore(float best)
     {
-        string text = best.ToString("D3");
+        Debug.Log($"UpdateBestScore => {best}");
+        string text = Mathf.RoundToInt(best).ToString("D3");
         if (bestScoreText != null)
             bestScoreText.text = text;
         if (bestScoreLabel != null)

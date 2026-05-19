@@ -108,6 +108,11 @@ public class GameManager : MonoBehaviour
         Application.Quit();
     }
 
+    public void GameOver()
+    {
+        HandleTrafficCollision();
+    }
+
     private void HandleTrafficCollision()
     {
         if (State == GameState.GameOver)

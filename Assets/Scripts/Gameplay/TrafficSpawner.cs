@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+// using Unity.Cinemachine;
 using UnityEngine;
 
 public class TrafficSpawner : MonoBehaviour
@@ -26,6 +27,14 @@ public class TrafficSpawner : MonoBehaviour
 
     private float _spawnTimer;
     private float _elapsed;
+    
+    // private static CinemachineImpulseSource _impulseSource;
+
+
+    // private void Awake()
+    // {
+    //     _impulseSource = GetComponent<CinemachineImpulseSource>();
+    // }
 
     private void Start()
     {
@@ -58,7 +67,7 @@ public class TrafficSpawner : MonoBehaviour
 
     private void Update()
     {
-        if (player == null)
+        if (player == null || GameManager.Instance.State != GameManager.GameState.Playing)
             return;
 
         _elapsed += Time.deltaTime;
@@ -140,17 +149,32 @@ public class TrafficSpawner : MonoBehaviour
 
         private void Update()
         {
+            if (GameManager.Instance.State != GameManager.GameState.Playing)
+                return;
+            
             transform.position += Vector3.back * (_speed * Time.deltaTime);
         }
 
         private void OnTriggerEnter(Collider other)
         {
+            if (GameManager.Instance.State != GameManager.GameState.Playing)
+                return;
+            
             if (_spawner == null || _player == null || other == null)
                 return;
 
             var t = other.transform;
             if (t == _player || t.IsChildOf(_player))
                 _spawner.RaiseTrafficCollision();
+            
+            // if (other.CompareTag("Traffic"))
+            // {
+            //     // Fire screen shake
+            //     _impulseSource.GenerateImpulse();
+            //
+            //     // Fire game over
+            //     _spawner.RaiseTrafficCollision();
+            // }
         }
     }
 }
