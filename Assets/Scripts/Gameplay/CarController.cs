@@ -35,6 +35,8 @@ public class CarController : MonoBehaviour
     private float _currentSpeed;
     private float _speedTimer;
 
+    public float CurrentSpeed => _currentSpeed;
+
     private Tween _laneTween;
     private bool _isChangingLane;
 
@@ -117,6 +119,8 @@ public class CarController : MonoBehaviour
 
         var oldSpeed = _currentSpeed;
         _currentSpeed = Mathf.Min(maxSpeed, _currentSpeed + speedIncreaseAmount);
+        
+        AudioManager.Instance.UpdateEnginePitch(_currentSpeed);
         if (!Mathf.Approximately(oldSpeed, _currentSpeed))
             OnSpeedChanged?.Invoke(_currentSpeed);
     }
