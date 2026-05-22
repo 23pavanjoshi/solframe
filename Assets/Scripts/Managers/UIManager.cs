@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject mainMenuPanel;
     [SerializeField] private GameObject hudPanel;
     [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private GameObject gameSettingPanel;
 
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI speedText;
@@ -47,6 +48,9 @@ public class UIManager : MonoBehaviour
         GameManager.OnGameStart += HandleGameStart;
         GameManager.OnGameOver += HandleGameOver;
         GameManager.OnGameRestart += HandleGameRestart;
+        GameManager.OnGamePause += HandleGamePause;
+        GameManager.OnGameResume += HandleGameResume;
+        GameManager.OnHomeButtonClick += HandleHomeClick;
         CarController.OnSpeedChanged += UpdateSpeed;
     }
 
@@ -55,6 +59,9 @@ public class UIManager : MonoBehaviour
         GameManager.OnGameStart -= HandleGameStart;
         GameManager.OnGameOver -= HandleGameOver;
         GameManager.OnGameRestart -= HandleGameRestart;
+        GameManager.OnGamePause -= HandleGamePause;
+        GameManager.OnGameResume -= HandleGameResume;
+        GameManager.OnHomeButtonClick -= HandleHomeClick;
         CarController.OnSpeedChanged -= UpdateSpeed;
     }
 
@@ -62,6 +69,7 @@ public class UIManager : MonoBehaviour
     {
         SetActiveSafe(mainMenuPanel, false);
         SetActiveSafe(gameOverPanel, false);
+        SetActiveSafe(gameSettingPanel, false);
         SetActiveSafe(hudPanel, true);
 
         UpdateScore(0);
@@ -74,10 +82,21 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    private void HandleGamePause()
+    {
+        SetActiveSafe(gameSettingPanel,true);
+    }
+    
+    private void HandleGameResume()
+    {
+        SetActiveSafe(gameSettingPanel,false);
+    }
+
     private void HandleGameOver()
     {
         SetActiveSafe(hudPanel, false);
         SetActiveSafe(gameOverPanel, true);
+        SetActiveSafe(gameSettingPanel,false);
 
         if (gameOverPanel != null)
         {
@@ -91,7 +110,16 @@ public class UIManager : MonoBehaviour
     private void HandleGameRestart()
     {
         SetActiveSafe(gameOverPanel, false);
+        SetActiveSafe(mainMenuPanel, false);
+        SetActiveSafe(gameSettingPanel,false);
+    }
+
+    private void HandleHomeClick()
+    {
         SetActiveSafe(mainMenuPanel, true);
+        SetActiveSafe(gameOverPanel, false);
+        SetActiveSafe(gameSettingPanel,false);
+        SetActiveSafe(hudPanel,false);
     }
 
     private static void SetActiveSafe(GameObject go, bool active)

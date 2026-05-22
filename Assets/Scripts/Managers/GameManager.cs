@@ -7,14 +7,18 @@ public class GameManager : MonoBehaviour
     {
         Menu,
         Playing,
+        Pause,
         GameOver
     }
 
     public static GameManager Instance { get; private set; }
 
     public static event Action OnGameStart;
+    public static event Action OnGamePause;
+    public static event Action OnGameResume;
     public static event Action OnGameOver;
     public static event Action OnGameRestart;
+    public static event Action OnHomeButtonClick;
 
     private const string BestScoreKey = "BestScore";
 
@@ -100,6 +104,20 @@ public class GameManager : MonoBehaviour
     public void PauseGame()
     {
         // Time.timeScale = 0f;
+        SetState(GameState.Pause);
+        OnGamePause?.Invoke();
+    }
+
+    public void ResumeGame()
+    {
+        SetState(GameState.Playing);
+        OnGameResume?.Invoke();
+    }
+    
+    public void HomeButtonClick()
+    {
+        SetState(GameState.Menu);
+        OnHomeButtonClick?.Invoke();
     }
 
     public void QuitGame()

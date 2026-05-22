@@ -23,6 +23,14 @@ public class AudioManager : MonoBehaviour
     private CarController _car;
     private bool _muted;
 
+    [Header("Main Menu button")]
+    [SerializeField] private GameObject muteButton;
+    [SerializeField] private GameObject unMuteButton;
+    
+    [Header("Setting Menu button")]
+    [SerializeField] private GameObject muteSettingButton;
+    [SerializeField] private GameObject unMuteSettingButton;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -146,10 +154,10 @@ public class AudioManager : MonoBehaviour
         sfxSource.pitch = Mathf.Lerp(EnginePitchMin, EnginePitchMax, t);
     }
 
-    public void MuteAll(bool mute)
+    public void MuteAll()
     {
-        _muted = mute;
-        PlayerPrefs.SetInt(MutedKey, mute ? 1 : 0);
+        _muted = !_muted;
+        PlayerPrefs.SetInt(MutedKey, _muted ? 1 : 0);
         PlayerPrefs.Save();
         ApplyMute();
     }
@@ -182,5 +190,10 @@ public class AudioManager : MonoBehaviour
 
         if (sfxSource != null)
             sfxSource.mute = _muted;
+        
+        muteButton.SetActive(!_muted);
+        unMuteButton.SetActive(_muted);
+        muteSettingButton.SetActive(!_muted);
+        unMuteSettingButton.SetActive(_muted);
     }
 }
