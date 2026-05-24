@@ -1210,8 +1210,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.17067234, y: 0, z: 0, w: 0.98532784}
-  m_LocalPosition: {x: 0, y: 3, z: -7}
+  m_LocalRotation: {x: 0.22975294, y: 0, z: 0, w: 0.973249}
+  m_LocalPosition: {x: 0, y: 3, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1639,8 +1639,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 393767052}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.17067234, y: 0, z: 0, w: 0.98532784}
-  m_LocalPosition: {x: 0, y: 3, z: -7}
+  m_LocalRotation: {x: 0.22975294, y: 0, z: 0, w: 0.973249}
+  m_LocalPosition: {x: 0, y: 3, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1662,7 +1662,7 @@ MonoBehaviour:
   ShoulderOffset: {x: 0, y: 2, z: 0}
   VerticalArmLength: 0.5
   CameraSide: 0.5
-  CameraDistance: 7
+  CameraDistance: 5
   AvoidObstacles:
     Enabled: 0
     CollisionFilter:
@@ -2490,9 +2490,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a618748848a9416479d97317c636d305, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrafficSpawner
-  trafficPrefab: {fileID: 8934376085213687571, guid: ffe88ddc4a183664599f6a9a437fdba3, type: 3}
-  poolSize: 10
-  spawnInterval: 3
+  trafficPrefabs:
+  - {fileID: 4949140811002017978, guid: cdc02303d18f67542ab7d11640047f27, type: 3}
+  - {fileID: 4949140811002017978, guid: 0b206dd4b6efd7440bfa4ba4a8d0ad5e, type: 3}
+  - {fileID: 4949140811002017978, guid: 80b13e3dec4418147b15ffa4ca2ecc8d, type: 3}
+  - {fileID: 4949140811002017978, guid: 55217392df67f3e46927667a7fd89579, type: 3}
+  - {fileID: 4949140811002017978, guid: e9c9b2f54cc005846b9c01460911d2f3, type: 3}
+  - {fileID: 4949140811002017978, guid: 2748a86411f21cf449e8ee52a4209625, type: 3}
+  - {fileID: 4949140811002017978, guid: 21309e0cbfe88a04891808c7364206f3, type: 3}
+  - {fileID: 4949140811002017978, guid: fefe8b0fdb1489740bf671b2fefc54c6, type: 3}
+  - {fileID: 4949140811002017978, guid: 3291d1a372328a74787a21da46a21d66, type: 3}
+  poolSizePerPrefab: 10
+  spawnInterval: 2
   player: {fileID: 464722264}
 --- !u!4 &636338702
 Transform:
@@ -10698,6 +10707,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2279571206968344201, guid: f1894eff73803134c9b7a94e9a5d562d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4804623288057018640, guid: f1894eff73803134c9b7a94e9a5d562d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -10742,10 +10755,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerCar
       objectReference: {fileID: 0}
+    - target: {fileID: 7695785838731270566, guid: f1894eff73803134c9b7a94e9a5d562d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8977665788817197195, guid: f1894eff73803134c9b7a94e9a5d562d, type: 3}
       propertyPath: speedLinesFX
       value: 
       objectReference: {fileID: 908796205}
+    - target: {fileID: 8977665788817197195, guid: f1894eff73803134c9b7a94e9a5d562d, type: 3}
+      propertyPath: speedIncreaseIntervalSeconds
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
