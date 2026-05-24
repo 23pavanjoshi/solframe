@@ -24,11 +24,14 @@ public class CarController : MonoBehaviour
     [Header("Input")]
     [SerializeField] private float swipeDeltaThresholdPixels = 50f;
 
-    private static CinemachineImpulseSource _impulseSource;
+    private CinemachineImpulseSource _impulseSource;
     
     [SerializeField] private GameObject collisionFXPrefab;
     [SerializeField] private ParticleSystem speedLinesFX;
     
+    private Transform _transform;
+    private ParticleSystem.EmissionModule _speedLinesEmission;
+    private float _lastSpeedForLines = -1f;
     private readonly float[] _laneXs = new float[3];
     private int _currentLaneIndex = 1; // 0=left, 1=center, 2=right
 
@@ -45,10 +48,13 @@ public class CarController : MonoBehaviour
 
     private void Awake()
     {
+        _transform = transform;
         _laneXs[0] = leftLaneX;
         _laneXs[1] = centerLaneX;
         _laneXs[2] = rightLaneX;
         _impulseSource = GetComponent<CinemachineImpulseSource>();
+        if (speedLinesFX != null)
+            _speedLinesEmission = speedLinesFX.emission;
     }
 
     private void OnEnable()
@@ -93,17 +99,18 @@ public class CarController : MonoBehaviour
     private void UpdateSpeedLines()
     {
         if (speedLinesFX == null) return;
-    
-        var emission = speedLinesFX.emission;
-    
+
+        if (Mathf.Approximately(_currentSpeed, _lastSpeedForLines)) return;
+        _lastSpeedForLines = _currentSpeed;
+
         // Map speed 10→30 to emission 0→80
         float t = Mathf.InverseLerp(10f, 30f, _currentSpeed);
-        emission.rateOverTime = Mathf.Lerp(0f, 80f, t);
+        _speedLinesEmission.rateOverTime = Mathf.Lerp(0f, 80f, t);
     }
 
     private void MoveForward()
     {
-        transform.position += Vector3.forward * (_currentSpeed * Time.deltaTime);
+        _transform.position += Vector3.forward * (_currentSpeed * Time.deltaTime);
     }
 
     private void TickSpeedRamp()
@@ -200,9 +207,9 @@ public class CarController : MonoBehaviour
 
     private void SnapToCurrentLaneX()
     {
-        var p = transform.position;
+        var p = _transform.position;
         p.x = _laneXs[_currentLaneIndex];
-        transform.position = p;
+        _transform.position = p;
     }
     
     private void OnTriggerEnter(Collider other)
@@ -217,11 +224,12 @@ public class CarController : MonoBehaviour
         {
             if (collisionFXPrefab != null)
             {
-                Instantiate(collisionFXPrefab, transform.position, Quaternion.identity);
+                Instantiate(collisionFXPrefab, _transform.position, Quaternion.identity);
             }
             
             // Fire screen shake
-            _impulseSource.GenerateImpulse();
+            if (_impulseSource != null)
+                _impulseSource.GenerateImpulse();
         
             // Fire game over
             GameManager.Instance.GameOver();
@@ -231,8 +239,7 @@ public class CarController : MonoBehaviour
     private void HandleGameOver()
     {
         if (speedLinesFX == null) return;
-    
-        var emission = speedLinesFX.emission;
-        emission.rateOverTime = 0;
+
+        _speedLinesEmission.rateOverTime = 0;
     }
 }

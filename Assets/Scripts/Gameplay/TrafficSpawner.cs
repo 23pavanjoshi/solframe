@@ -103,7 +103,11 @@ public class TrafficSpawner : MonoBehaviour
 
     private void Update()
     {
-        if (player == null || GameManager.Instance.State != GameManager.GameState.Playing)
+        if (player == null)
+            return;
+
+        var state = GameManager.Instance.State;
+        if (state != GameManager.GameState.Playing)
             return;
 
         _elapsed += Time.deltaTime;
@@ -154,14 +158,17 @@ public class TrafficSpawner : MonoBehaviour
 
         float laneX = LaneXs[UnityEngine.Random.Range(0, LaneXs.Length)];
 
+        float spawnY = car.transform.position.y;
+
         Vector3 spawnPos = new Vector3(
             laneX,
-            car.transform.position.y,
+            spawnY,
             playerPos.z + SpawnAheadDistance
         );
 
         car.transform.position = spawnPos;
         car.gameObject.SetActive(true);
+        car.IsActive = true;
 
         _active.Add(car);
     }
@@ -191,6 +198,7 @@ public class TrafficSpawner : MonoBehaviour
 
     private void ReturnToPool(TrafficCarPooled car)
     {
+        car.IsActive = false;
         car.gameObject.SetActive(false);
 
         if (_pools.TryGetValue(car.PrefabPoolIndex, out Queue<TrafficCarPooled> pool))
@@ -208,9 +216,12 @@ public class TrafficSpawner : MonoBehaviour
     {
         private TrafficSpawner _spawner;
         private Transform _player;
+        private Transform _transform;
         private float _speed;
+        private Vector3 _movePerSecond;
 
         public int PrefabPoolIndex { get; private set; }
+        public bool IsActive { get; set; }
 
         public void Init(
             TrafficSpawner spawner,
@@ -222,14 +233,16 @@ public class TrafficSpawner : MonoBehaviour
             _player = player;
             _speed = speed;
             PrefabPoolIndex = prefabPoolIndex;
+            _transform = transform;
+            _movePerSecond = Vector3.back * speed;
         }
 
         private void Update()
         {
-            if (GameManager.Instance.State != GameManager.GameState.Playing)
+            if (!IsActive)
                 return;
 
-            transform.position += Vector3.back * (_speed * Time.deltaTime);
+            _transform.position += _movePerSecond * Time.deltaTime;
         }
 
         private void OnTriggerEnter(Collider other)

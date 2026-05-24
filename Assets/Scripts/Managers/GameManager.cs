@@ -31,6 +31,8 @@ public class GameManager : MonoBehaviour
     public float BestScore { get; private set; }
 
     private float _scoreStartPlayerZ;
+    private float _lastReportedScore = -1f;
+    private const float ScoreReportThreshold = 1f;
 
     private void Awake()
     {
@@ -67,23 +69,27 @@ public class GameManager : MonoBehaviour
         if (State != GameState.Playing || player == null)
             return;
 
-        Score = Mathf.Max(0f, player.position.z - _scoreStartPlayerZ);
+        float pz = player.position.z;
+        Score = Mathf.Max(0f, pz - _scoreStartPlayerZ);
 
-        UIManager.Instance.UpdateScore(Score);
+        if (Score - _lastReportedScore >= ScoreReportThreshold)
+        {
+            _lastReportedScore = Score;
+            UIManager.Instance.UpdateScore(Score);
+        }
         // UIManager.Instance.UpdateSpeed(speed);
         if (Score > BestScore)
-        {
-            Debug.Log("Score : " + Score);
             BestScore = Score;
-        }
     }
 
     public void StartGame()
     {
+        Time.timeScale = 1f;
         if (player == null)
             TryResolvePlayer();
 
         Score = 0f;
+        _lastReportedScore = -1f;
         _scoreStartPlayerZ = player != null ? player.position.z : 0f;
 
         SetState(GameState.Playing);
@@ -92,9 +98,11 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
+        Time.timeScale = 1f;
         SaveBestScoreIfNeeded();
 
         Score = 0f;
+        _lastReportedScore = -1f;
         _scoreStartPlayerZ = player != null ? player.position.z : 0f;
 
         SetState(GameState.Playing);
@@ -103,13 +111,17 @@ public class GameManager : MonoBehaviour
 
     public void PauseGame()
     {
-        // Time.timeScale = 0f;
-        SetState(GameState.Pause);
-        OnGamePause?.Invoke();
+        if (State == GameState.Playing)
+        {
+            Time.timeScale = 0f;
+            SetState(GameState.Pause);
+            OnGamePause?.Invoke();
+        }
     }
 
     public void ResumeGame()
     {
+        Time.timeScale = 1f;
         SetState(GameState.Playing);
         OnGameResume?.Invoke();
     }
@@ -123,6 +135,7 @@ public class GameManager : MonoBehaviour
     public void QuitGame()
     {
         SaveBestScoreIfNeeded();
+        PlayerPrefs.Save();
         Application.Quit();
     }
 
@@ -136,8 +149,10 @@ public class GameManager : MonoBehaviour
         if (State == GameState.GameOver)
             return;
 
+        Time.timeScale = 1f;
         SetState(GameState.GameOver);
         SaveBestScoreIfNeeded();
+        PlayerPrefs.Save();
         OnGameOver?.Invoke();
         UIManager.Instance.UpdateBestScore(BestScore);
     }
@@ -184,6 +199,5 @@ public class GameManager : MonoBehaviour
             return;
 
         PlayerPrefs.SetFloat(BestScoreKey, BestScore);
-        PlayerPrefs.Save();
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,9 +16,19 @@ public class RoadSpawner : MonoBehaviour
     private Transform _mainCameraTransform;
     private float _nextSpawnZ;
     private float _lastTileZ;
+    private bool _recycledThisFrame;
 
     private void Awake()
     {
+        if (Camera.main != null)
+            _mainCameraTransform = Camera.main.transform;
+        else
+            StartCoroutine(AssignMainCameraNextFrame());
+    }
+
+    private IEnumerator AssignMainCameraNextFrame()
+    {
+        yield return null;
         if (Camera.main != null)
             _mainCameraTransform = Camera.main.transform;
     }
@@ -58,18 +69,24 @@ public class RoadSpawner : MonoBehaviour
 
     private void Update()
     {
+        _recycledThisFrame = false;
+
         if (_tiles.Count == 0)
             return;
 
-        if (_mainCameraTransform == null && Camera.main != null)
-            _mainCameraTransform = Camera.main.transform;
+        float playerZ = 0f;
+        if (player != null)
+            playerZ = player.position.z;
 
         // Keep road filled ahead of the player.
-        if (player != null && (player.position.z + SpawnThreshold) >= _lastTileZ)
+        if (!_recycledThisFrame && player != null && (playerZ + SpawnThreshold) >= _lastTileZ)
+        {
             RecycleOldestToFront();
+            _recycledThisFrame = true;
+        }
 
         // Recycle any tiles that are safely behind the camera.
-        if (_mainCameraTransform != null)
+        if (!_recycledThisFrame && _mainCameraTransform != null)
         {
             var recycleZ = _mainCameraTransform.position.z - RecycleBehindCameraDistance;
             while (_tiles.Count > 0 && _tiles.Peek().position.z <= recycleZ)
